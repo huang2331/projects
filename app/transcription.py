@@ -22,7 +22,8 @@ class LocalWhisperTranscriber:
             from faster_whisper import WhisperModel
         except (ImportError, OSError) as exc:
             raise TranscriptionUnavailable(
-                "Local transcription is not installed or could not load. Install requirements-transcription.txt and ensure the model can be downloaded."
+                "Local transcription could not start because a runtime dependency failed "
+                f"to load ({type(exc).__name__}: {exc})."
             ) from exc
         if self._model is None:
             try:
@@ -43,3 +44,5 @@ class LocalWhisperTranscriber:
             raise
         except Exception as exc:
             raise ValueError("The audio could not be transcribed. Make sure it is a readable MP3 containing clear English speech.") from exc
+
+
