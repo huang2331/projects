@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: voice-coach-for-teachers
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: WHISPER_MODEL
+        value: tiny.en
+      - key: WHISPER_DEVICE
+        value: cpu
+      - key: WHISPER_COMPUTE_TYPE
+        value: int8

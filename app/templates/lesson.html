@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% block title %}{{ lesson.title }} · Voice Coach{% endblock %}{% block content %}
+<section class="dashboard-head"><a href="/">← All recordings</a><span class="tag">ANALYSIS COMPLETE</span><h1>{{ lesson.title }}</h1><p>Objective delivery metrics and downloadable transcript files</p></section>
+{% if lesson.analysis.warning %}<div class="notice">{{ lesson.analysis.warning }}</div>{% endif %}
+<section class="stat-grid"><article><small>WORD COUNT</small><b>{{ lesson.word_count }}</b><p>spoken words</p></article>{% if lesson.duration_label %}<article><small>DURATION</small><b>{{ lesson.duration_label }}</b><p>minutes</p></article><article><small>EST. PACE</small><b>{{ lesson.wpm }}</b><p>words per minute</p></article>{% endif %}</section>
+{% if lesson.analysis.speech_quality %}
+{% set q = lesson.analysis.speech_quality %}
+<section class="quality-section">
+  <div class="quality-heading"><div><p class="eyebrow">SPEECH QUALITY</p><h2>Delivery metrics</h2></div><p>Calculated from the recording and transcript timestamps—not from subjective AI judgment.</p></div>
+  <div class="quality-grid">
+    <article class="quality-card"><small>SPEECH RATE</small><b>{{ q.speech_rate_wpm if q.speech_rate_wpm is not none else "—" }}</b><span>words/min overall</span><p>Total words divided by recording duration.</p></article>
+    <article class="quality-card"><small>ARTICULATION RATE</small><b>{{ q.articulation_rate_wpm if q.articulation_rate_wpm is not none else "—" }}</b><span>words/min while speaking</span><p>Rate with detected pauses removed.</p></article>
+    <article class="quality-card"><small>SPEAKING TIME</small><b>{{ q.speaking_ratio_percent if q.speaking_ratio_percent is not none else "—" }}{% if q.speaking_ratio_percent is not none %}%{% endif %}</b><span>of the recording</span><p>Share covered by timestamped speech segments.</p></article>
+    <article class="quality-card"><small>PAUSE TIME</small><b>{{ q.pause_ratio_percent if q.pause_ratio_percent is not none else "—" }}{% if q.pause_ratio_percent is not none %}%{% endif %}</b><span>{{ q.average_pause_seconds }}s average pause</span><p>{{ q.long_pause_count }} pauses of two seconds or longer.</p></article>
+    <article class="quality-card"><small>PROSODY · PITCH RANGE</small><b>{{ q.pitch_range_semitones if q.pitch_range_semitones is not none else "—" }}</b><span>semitones (10th–90th percentile)</span><p>{% if q.pitch_median_hz is not none %}Median detected pitch: {{ q.pitch_median_hz }} Hz.{% else %}Reliable pitch was not detected.{% endif %}</p></article>
+    <article class="quality-card"><small>VOCAL DYNAMICS</small><b>{{ q.dynamic_range_db if q.dynamic_range_db is not none else "—" }}</b><span>dB range</span><p>Difference between typical quiet and loud speech frames.</p></article>
+    <article class="quality-card"><small>ACOUSTIC CLARITY</small><b>{{ q.clarity_proxy_percent if q.clarity_proxy_percent is not none else "—" }}{% if q.clarity_proxy_percent is not none %}%{% endif %}</b><span>speech-band energy</span><p>An acoustic proxy, not a measure of comprehension or pronunciation accuracy.</p></article>
+    <article class="quality-card"><small>FILLER WORDS</small><b>{{ q.fillers_per_100_words }}</b><span>per 100 words</span><p>{{ q.filler_count }} detected transcript fillers such as “um” and “uh”.</p></article>
+  </div>
+</section>
+{% else %}
+<div class="notice quality-missing"><b>Speech-quality metrics are unavailable for this saved recording.</b> Re-upload the original MP3 to calculate acoustic measures; audio files are deleted after processing for privacy.</div>
+{% endif %}
+<section class="panel transcript download-panel"><div><p class="eyebrow">TRANSCRIPT FILES</p><h2>Download the transcript</h2><p>The transcript is not displayed on this page. Download it as plain text or as timestamped CSV.</p></div><div class="download-actions"><a href="/lessons/{{ lesson.id }}/transcript.txt">Download .txt</a><a class="csv-download" href="/lessons/{{ lesson.id }}/transcript.csv">Download .csv</a></div><p class="download-note">CSV columns: start time, end time, and transcript text for every segment.</p></section>
+{% endblock %}
